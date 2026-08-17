@@ -1,3 +1,4 @@
+using FeatureRequestPortal.FeatureRequests;
 using Microsoft.EntityFrameworkCore;
 using Volo.Abp.AuditLogging.EntityFrameworkCore;
 using Volo.Abp.BackgroundJobs.EntityFrameworkCore;
@@ -9,9 +10,9 @@ using Volo.Abp.EntityFrameworkCore.Modeling;
 using Volo.Abp.FeatureManagement.EntityFrameworkCore;
 using Volo.Abp.Identity;
 using Volo.Abp.Identity.EntityFrameworkCore;
+using Volo.Abp.OpenIddict.EntityFrameworkCore;
 using Volo.Abp.PermissionManagement.EntityFrameworkCore;
 using Volo.Abp.SettingManagement.EntityFrameworkCore;
-using Volo.Abp.OpenIddict.EntityFrameworkCore;
 using Volo.Abp.TenantManagement;
 using Volo.Abp.TenantManagement.EntityFrameworkCore;
 
@@ -26,6 +27,9 @@ public class FeatureRequestPortalDbContext :
     IIdentityDbContext
 {
     /* Add DbSet properties for your Aggregate Roots / Entities here. */
+    public DbSet<FeatureRequest> FeatureRequests { get; set; }
+    public DbSet<Vote> Votes { get; set; }
+    public DbSet<Comment> Comments { get; set; }
 
 
     #region Entities from the modules
@@ -81,11 +85,48 @@ public class FeatureRequestPortalDbContext :
 
         /* Configure your own tables/entities inside here */
 
-        //builder.Entity<YourEntity>(b =>
-        //{
-        //    b.ToTable(FeatureRequestPortalConsts.DbTablePrefix + "YourEntities", FeatureRequestPortalConsts.DbSchema);
-        //    b.ConfigureByConvention(); //auto configure for the base class props
-        //    //...
-        //});
+        builder.Entity<FeatureRequest>(b =>
+        {
+            b.ToTable(FeatureRequestPortalConsts.DbTablePrefix + "FeatureRequests", FeatureRequestPortalConsts.DbSchema);
+            
+            b.ConfigureByConvention(); //auto configure for the base class props
+
+            b.Property(x => x.Title).IsRequired()//Not Null
+            .HasMaxLength(FeatureRequestConst.MaxTitleLength);
+
+            b.Property(x => x.Description).HasMaxLength(FeatureRequestConst.MaxDescriptionLength);
+
+            
+        });
+
+        builder.Entity<Vote>(b =>
+        {
+            b.ToTable(FeatureRequestPortalConsts.DbTablePrefix + "Votes", FeatureRequestPortalConsts.DbSchema);
+
+            b.ConfigureByConvention(); //auto configure for the base class props
+
+            b.HasOne<FeatureRequest>()//It mean "A Vote belongs to a FeatureRequest"
+            .WithMany(x => x.Votes)// One-to-many relationship, a FeatureRequest can have multiple Votes
+            .HasForeignKey(x => x.FeatureRequestId)
+            .IsRequired();
+
+            b.HasIndex(x => new { x.FeatureRequestId, x.CreatorId }).IsUnique();
+        });
+
+        builder.Entity<Comment>(b =>
+        {
+            b.ToTable(FeatureRequestPortalConsts.DbTablePrefix + "Comments", FeatureRequestPortalConsts.DbSchema);
+
+            b.ConfigureByConvention(); //auto configure for the base class props
+
+            b.HasOne<FeatureRequest>() //"A Comment belongs to a FeatureRequest"
+            .WithMany(x => x.Comments) //"A FeatureRequest can have multiple Comments"
+            .HasForeignKey(x => x.FeatureRequestId)
+            .IsRequired();
+
+            b.Property(x => x.Text).HasMaxLength(FeatureRequestConst.MaxCommentLength)
+            .IsRequired();
+
+        });
     }
 }

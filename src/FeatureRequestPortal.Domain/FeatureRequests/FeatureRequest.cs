@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Volo.Abp;
 using Volo.Abp.Domain.Entities.Auditing;
 
@@ -27,6 +28,8 @@ namespace FeatureRequestPortal.FeatureRequests
             //This constructure is just for ORM         
         }
 
+
+        //it is for generating new Feature request
         internal FeatureRequest(
            Guid id,
            string title,
@@ -50,10 +53,6 @@ namespace FeatureRequestPortal.FeatureRequests
             );
         }
 
-        internal void IncreaseVoteCount()
-        {
-            VoteCount++; //don’t want VoteCount to be incremented externally bc of that, it is internal.
-        }
         private void SetDescription(string description)
         {
             Description = Check.Length(
@@ -63,7 +62,24 @@ namespace FeatureRequestPortal.FeatureRequests
             );
         }
 
-       
+        public void AddVote(Guid voteId, Guid userId)
+        {
+            bool alreadyVoted = _votes.Any(vote => vote.CreatorId == userId);
+
+            if (alreadyVoted)
+            {
+                throw new BusinessException("Already Voted");
+            }
+
+            _votes.Add(new Vote(voteId, Id));
+
+            VoteCount++;
+        }
+
+        public void AddComment(Guid commentId, string text) 
+        {
+            _comments.Add(new Comment(commentId, Id, text));
+        }
 
     }
 
