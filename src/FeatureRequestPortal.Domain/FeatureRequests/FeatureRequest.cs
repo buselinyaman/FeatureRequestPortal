@@ -7,14 +7,15 @@ using Volo.Abp.Domain.Entities.Auditing;
 namespace FeatureRequestPortal.FeatureRequests
 {
     // FeatureRequest is a Aggregate Root
-    public class FeatureRequest:AuditedAggregateRoot<Guid>
+    public class FeatureRequest:AuditedAggregateRoot<Guid>, ISoftDelete
     {
         
         //Don't need to add Id property manually bc AuditedAggregateRoot<Guid> adds it automatically
         public string Title { get; private set; }
-        public string Description { get; private set; }
+        public string? Description { get; private set; }
         public FeatureRequestStatus Status { get; private set; }
         public int VoteCount { get; private set; }
+        public bool IsDeleted { get; private set; }
 
         //
         private readonly List<Vote> _votes = new(); //Child Entity
@@ -33,7 +34,7 @@ namespace FeatureRequestPortal.FeatureRequests
         internal FeatureRequest(
            Guid id,
            string title,
-           string description)
+           string? description)
            : base(id)
         {
             SetTitle(title);
@@ -53,7 +54,7 @@ namespace FeatureRequestPortal.FeatureRequests
             );
         }
 
-        private void SetDescription(string description)
+        private void SetDescription(string? description)
         {
             Description = Check.Length(
                 description,
@@ -79,6 +80,12 @@ namespace FeatureRequestPortal.FeatureRequests
         public void AddComment(Guid commentId, string text) 
         {
             _comments.Add(new Comment(commentId, Id, text));
+        }
+
+        // It is used for changing the status of the Feature Request
+        public void ChangeStatus(FeatureRequestStatus status)
+        {
+            Status = status;
         }
 
     }
