@@ -7,8 +7,7 @@ public static class FeatureRequestPortalPermissions
     //Add your own permission names. Example:
     //public const string MyPermission1 = GroupName + ".MyPermission1";
 
-    public const string Default = GroupName + ".FeatureRequests";
-    public const string Create = Default + ".Create";
-    public const string Update = Default + ".Update";
-    public const string Delete = Default + ".Delete";
+    public const string Manage = GroupName + ".FeatureRequests";
+    public const string Update = Manage + ".Update";
+    public const string Delete = Manage + ".Delete";
 }

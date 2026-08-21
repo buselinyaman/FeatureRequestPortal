@@ -62,7 +62,7 @@ namespace FeatureRequestPortal.FeatureRequests
             return featureRequestDto;
         }
 
-        [Authorize(FeatureRequestPortalPermissions.Default)]
+        [Authorize(FeatureRequestPortalPermissions.Manage)]
         public async Task<AdminFeatureRequestDto> GetAdminAsync(Guid id)
         {
             var featureRequest = await Repository.GetAsync(id, includeDetails: true);

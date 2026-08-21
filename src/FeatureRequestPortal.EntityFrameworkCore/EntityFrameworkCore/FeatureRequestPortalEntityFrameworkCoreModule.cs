@@ -1,19 +1,22 @@
-using System;
+using FeatureRequestPortal.FeatureRequests;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using Volo.Abp.Uow;
+using System;
 using Volo.Abp.AuditLogging.EntityFrameworkCore;
 using Volo.Abp.BackgroundJobs.EntityFrameworkCore;
+using Volo.Abp.BlobStoring.Database.EntityFrameworkCore;
 using Volo.Abp.EntityFrameworkCore;
+using Volo.Abp.EntityFrameworkCore.DependencyInjection;
 using Volo.Abp.EntityFrameworkCore.PostgreSql;
 using Volo.Abp.FeatureManagement.EntityFrameworkCore;
 using Volo.Abp.Identity.EntityFrameworkCore;
-using Volo.Abp.OpenIddict.EntityFrameworkCore;
 using Volo.Abp.Modularity;
+using Volo.Abp.OpenIddict.EntityFrameworkCore;
 using Volo.Abp.PermissionManagement.EntityFrameworkCore;
 using Volo.Abp.SettingManagement.EntityFrameworkCore;
-using Volo.Abp.BlobStoring.Database.EntityFrameworkCore;
-using Volo.Abp.TenantManagement.EntityFrameworkCore;
 using Volo.Abp.Studio;
+using Volo.Abp.TenantManagement.EntityFrameworkCore;
+using Volo.Abp.Uow;
 
 namespace FeatureRequestPortal.EntityFrameworkCore;
 
@@ -47,6 +50,19 @@ public class FeatureRequestPortalEntityFrameworkCoreModule : AbpModule
                 /* Remove "includeAllEntities: true" to create
                  * default repositories only for aggregate roots */
             options.AddDefaultRepositories(includeAllEntities: true);
+        });
+
+
+        //That mean i'm asking ABP “What do I mean when I say ‘details’ for a FeatureRequest?” 
+        Configure<AbpEntityOptions>(options =>
+        {
+            options.Entity<FeatureRequest>(featureRequestOptions =>
+            {
+                featureRequestOptions.DefaultWithDetailsFunc = query =>
+                    query
+                        .Include(x => x.Votes)
+                        .Include(x => x.Comments);
+            });
         });
 
         if (AbpStudioAnalyzeHelper.IsInAnalyzeMode)
