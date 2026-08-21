@@ -13,7 +13,14 @@ public class FeatureRequestPortalPermissionDefinitionProvider : PermissionDefini
 
         //Define your own permissions here. Example:
         //myGroup.AddPermission(FeatureRequestPortalPermissions.MyPermission1, L("Permission:MyPermission1"));
+
+        myGroup.AddPermission(FeatureRequestPortalPermissions.Create, L("Permission:Create"));
+        myGroup.AddPermission(FeatureRequestPortalPermissions.Update, L("Permission:Update"));
+        myGroup.AddPermission(FeatureRequestPortalPermissions.Default, L("Permission:Default"));
+        myGroup.AddPermission(FeatureRequestPortalPermissions.Delete, L("Permission:Delete"));
+
     }
+
 
     private static LocalizableString L(string name)
     {

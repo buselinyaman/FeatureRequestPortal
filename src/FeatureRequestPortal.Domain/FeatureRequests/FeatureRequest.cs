@@ -31,7 +31,7 @@ namespace FeatureRequestPortal.FeatureRequests
 
 
         //it is for generating new Feature request
-        internal FeatureRequest(
+        public FeatureRequest(
            Guid id,
            string title,
            string? description)
@@ -86,6 +86,16 @@ namespace FeatureRequestPortal.FeatureRequests
         public void ChangeStatus(FeatureRequestStatus status)
         {
             Status = status;
+        }
+
+        public void ChangeTitle(string title)
+        {
+            SetTitle(title);
+        }
+
+        public void ChangeDescription(string? description)
+        {
+            SetDescription(description);
         }
 
     }
